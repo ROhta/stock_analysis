@@ -95,8 +95,9 @@ call_jquants_api() {
     echo "$body"
 }
 
-# 結果格納用配列
-typeset -a results
+# 結果格納用一時ファイル
+RESULT_FILE=$(mktemp)
+trap "rm -f $RESULT_FILE" EXIT
 
 # 3. CSVファイルを1行ずつ処理（ヘッダー行をスキップ）
 tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
@@ -153,7 +154,7 @@ tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
 
     if (( $(echo "$min_close < $threshold" | bc -l) )); then
         echo "  ✓ 条件該当: 最安値($min_close) < 95%閾値($threshold)" >&2
-        echo "$code,$name"
+        echo "$code,$name" >> "$RESULT_FILE"
     else
         echo "  条件非該当: 最安値($min_close) >= 95%閾値($threshold)" >&2
     fi
@@ -164,3 +165,15 @@ done
 
 echo "" >&2
 echo "=== 分析完了 ===" >&2
+echo "" >&2
+
+# 条件に該当する銘柄を表示
+if [[ -s "$RESULT_FILE" ]]; then
+    echo "=== 条件に該当する銘柄（最安値が権利付最終日の株価の95%未満）===" >&2
+    echo "" >&2
+    while IFS=',' read -r code name; do
+        echo "証券コード: $code - 銘柄名: $name"
+    done < "$RESULT_FILE"
+else
+    echo "条件に該当する銘柄はありませんでした。" >&2
+fi
