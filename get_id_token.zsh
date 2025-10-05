@@ -58,7 +58,16 @@ main() {
     fi
 
     echo "IDトークンの取得に成功しました" >&2
-    echo "export JQUANTS_ID_TOKEN=\"$id_token\""
+
+    # スクリプトがsourceで実行されているかチェック
+    if [[ "${(%):-%x}" != "${0}" ]]; then
+        # sourceで実行されている場合は直接exportする
+        export JQUANTS_ID_TOKEN="$id_token"
+        echo "環境変数JQUANTS_ID_TOKENを設定しました" >&2
+    else
+        # 直接実行されている場合はexportコマンドを出力
+        echo "export JQUANTS_ID_TOKEN=\"$id_token\""
+    fi
 }
 
 # スクリプトを直接実行した場合
