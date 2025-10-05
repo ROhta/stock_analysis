@@ -1,2 +1,30 @@
-# stock_analysis
-with J-Quants API
+## 概要
+
+- [J-Quants API](https://jpx.gitbook.io/j-quants-ja/api-reference)を使用して、株の分析を行う
+- 現在の分析内容は後述
+
+## 用意するもの
+
+- zsh
+- J-Quants APIの認証情報（下記のいずれか）
+  - [リフレッシュトークン](https://jpx-jquants.com/dashboard/menu/?lang=ja)
+  - メールアドレスとパスワード
+- 下記のヘッダーを持つcsv
+  - 証券コード
+  - 銘柄名
+  - 市場区分
+  - 指定日
+
+## スクリプトの実行順
+
+1. get_id_token.zsh 認証情報を用いて、IDトークンを取得
+2. analysis_stock.zsh csvのファイルパスを引数にとって、分析結果を出力
+
+## 分析内容
+
+- 指定日から10営業日以内の最安値が指定日の株価の95%未満の銘柄
+
+## 今後の開発検討事項
+
+- 最安値の検索範囲を10営業日固定にしているが、任意の日数を入れられるようにするか検討
+- 株価の比較値を95%にしているが、任意の割合を入れられるようにするか検討
