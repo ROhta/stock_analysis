@@ -58,7 +58,7 @@ main() {
     fi
 
     echo "IDトークンの取得に成功しました" >&2
-    export JQUANTS_ID_TOKEN="$id_token"
+    echo "export JQUANTS_ID_TOKEN=\"$id_token\""
 }
 
 # スクリプトを直接実行した場合
