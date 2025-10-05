@@ -1,5 +1,12 @@
 #!/bin/zsh
 
+# スクリプトがsourceで実行されているかチェック
+if [[ ! $ZSH_EVAL_CONTEXT =~ :file ]]; then
+    echo "Error: このスクリプトは source コマンドで実行する必要があります" >&2
+    echo "使用方法: source get_id_token.zsh" >&2
+    exit 1
+fi
+
 # J-Quants APIからリフレッシュトークンを取得する関数
 get_jquants_refresh_token() {
     local response=$(curl -s -X POST "https://api.jquants.com/v1/token/auth_user" \
@@ -58,16 +65,8 @@ main() {
     fi
 
     echo "IDトークンの取得に成功しました" >&2
-
-    # スクリプトがsourceで実行されているかチェック
-    if [[ "${(%):-%x}" != "${0}" ]]; then
-        # sourceで実行されている場合は直接exportする
-        export JQUANTS_ID_TOKEN="$id_token"
-        echo "環境変数JQUANTS_ID_TOKENを設定しました" >&2
-    else
-        # 直接実行されている場合はexportコマンドを出力
-        echo "export JQUANTS_ID_TOKEN=\"$id_token\""
-    fi
+    export JQUANTS_ID_TOKEN="$id_token"
+    echo "環境変数JQUANTS_ID_TOKENを設定しました" >&2
 }
 
 main
