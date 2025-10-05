@@ -25,17 +25,19 @@ if ! command -v jq &> /dev/null; then
     exit 1
 fi
 
-# get_id_token.shを読み込んでIDトークンを取得
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/get_id_token.sh"
-
-echo "J-Quants APIの認証中..." >&2
-if ! main; then
-    echo "エラー: 認証に失敗しました" >&2
+# IDトークンの存在確認
+if [[ -z "$JQUANTS_ID_TOKEN" ]]; then
+    echo "エラー: JQUANTS_ID_TOKEN環境変数が設定されていません" >&2
+    echo "" >&2
+    echo "以下のコマンドを実行してIDトークンを取得してください:" >&2
+    echo "  source ./get_id_token.zsh" >&2
+    echo "" >&2
+    echo "または、JQUANTS_REFRESH_TOKEN環境変数を設定してから:" >&2
+    echo "  JQUANTS_ID_TOKEN=\$(./get_id_token.zsh && echo \$JQUANTS_ID_TOKEN)" >&2
     exit 1
 fi
 
-# IDトークンは環境変数 JQUANTS_ID_TOKEN に設定されている
+echo "J-Quants APIのIDトークンを確認しました" >&2
 
 # 営業日を取得する関数（土日祝日を除外）
 get_trading_days() {
@@ -74,31 +76,32 @@ get_trading_days() {
     echo "${trading_days[@]}"
 }
 
-# API呼び出しカウンタ
-API_CALL_COUNT=0
-LAST_TOKEN_REFRESH=0
+# レート制限エラーをチェックする関数
+check_rate_limit_error() {
+    local response="$1"
 
-# IDトークンを更新する関数（レート制限対策）
-refresh_id_token_if_needed() {
-    local current_time=$(date +%s)
-    local time_diff=$((current_time - LAST_TOKEN_REFRESH))
-
-    # 10秒以内に取得したトークンは再利用
-    if [[ $time_diff -lt 10 && -n "$JQUANTS_ID_TOKEN" ]]; then
-        return 0
-    fi
-
-    # 新しいトークンを取得
-    if [[ -n "$JQUANTS_REFRESH_TOKEN" ]]; then
-        local new_id_token=$(get_jquants_id_token "$JQUANTS_REFRESH_TOKEN" 2>/dev/null)
-        if [[ -n "$new_id_token" ]]; then
-            export JQUANTS_ID_TOKEN="$new_id_token"
-            LAST_TOKEN_REFRESH=$current_time
-            sleep 1  # APIレート制限対策
-            return 0
+    # レート制限のエラーメッセージをチェック
+    if echo "$response" | jq -e '.message' > /dev/null 2>&1; then
+        local error_msg=$(echo "$response" | jq -r '.message')
+        if [[ "$error_msg" =~ "rate limit" ]] || [[ "$error_msg" =~ "Too Many Requests" ]]; then
+            echo "" >&2
+            echo "========================================" >&2
+            echo "エラー: J-Quants APIのレート制限に達しました" >&2
+            echo "しばらく時間をおいてから再度実行してください。" >&2
+            echo "========================================" >&2
+            exit 1
         fi
     fi
-    return 1
+
+    # HTTPステータスコード429もチェック
+    if echo "$response" | grep -qi "429"; then
+        echo "" >&2
+        echo "========================================" >&2
+        echo "エラー: J-Quants APIのレート制限に達しました" >&2
+        echo "しばらく時間をおいてから再度実行してください。" >&2
+        echo "========================================" >&2
+        exit 1
+    fi
 }
 
 # 株価データを取得する関数
@@ -116,21 +119,13 @@ get_stock_price() {
 
     local url="https://api.jquants.com/v1/prices/daily_quotes?code=${code}&from=${from_date}&to=${to_date}"
 
-    # トークンを確認・更新
-    refresh_id_token_if_needed
-
-    # API呼び出し前に待機（レート制限対策）
-    ((API_CALL_COUNT++))
-    if [[ $((API_CALL_COUNT % 5)) -eq 0 ]]; then
-        sleep 2
-    else
-        sleep 0.5
-    fi
-
     local response=$(curl -s -X GET "$url" \
         -H "Authorization: Bearer ${JQUANTS_ID_TOKEN}")
 
-    # エラーチェック
+    # レート制限エラーをチェック
+    check_rate_limit_error "$response"
+
+    # データ取得の確認
     if echo "$response" | jq -e '.daily_quotes' > /dev/null 2>&1; then
         # 指定日付のデータを検索（YYYY-MM-DD形式に変換）
         local search_date=$(echo "$query_date" | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
@@ -170,7 +165,6 @@ get_min_price_in_period() {
                 min_price="$price"
             fi
         fi
-        sleep 0.2  # API制限対策
     done
 
     if [[ ${#prices[@]} -gt 0 ]]; then
@@ -213,33 +207,12 @@ while IFS=, read -r code name market ex_date; do
 
     echo "権利付最終日の株価: $ex_date_price 円" >&2
 
-    # 再度確認
-    sleep 0.3
-    local ex_date_price_verify=$(get_stock_price "$code" "$ex_date")
-    if [[ "$ex_date_price" != "$ex_date_price_verify" ]]; then
-        echo "警告: 株価の再確認で異なる値が返されました" >&2
-        echo "  1回目: $ex_date_price 円" >&2
-        echo "  2回目: $ex_date_price_verify 円" >&2
-        ex_date_price="$ex_date_price_verify"
-    fi
-
     # 10営業日の最安値を取得
     local min_price=$(get_min_price_in_period "$code" "$ex_date")
 
     if [[ -z "$min_price" ]]; then
         echo "エラー: 10営業日の株価データが取得できませんでした" >&2
         continue
-    fi
-
-    # 再度確認
-    echo "  10営業日の最安値を再確認中..." >&2
-    sleep 0.5
-    local min_price_verify=$(get_min_price_in_period "$code" "$ex_date")
-    if [[ "$min_price" != "$min_price_verify" ]]; then
-        echo "  警告: 最安値の再確認で異なる値が返されました" >&2
-        echo "    1回目: $min_price 円" >&2
-        echo "    2回目: $min_price_verify 円" >&2
-        min_price="$min_price_verify"
     fi
 
     # 下落率を計算
