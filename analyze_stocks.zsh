@@ -32,7 +32,7 @@ if [[ -z "$JQUANTS_ID_TOKEN" ]]; then
 fi
 
 # 2. CSVヘッダーの確認
-REQUIRED_HEADERS=("証券コード" "銘柄名" "市場区分" "権利付最終日")
+REQUIRED_HEADERS=("証券コード" "銘柄名" "市場区分" "指定日")
 HEADER=$(head -n 1 "$CSV_FILE")
 
 for required in "${REQUIRED_HEADERS[@]}"; do
@@ -112,26 +112,26 @@ tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
         continue
     fi
 
-    echo "処理中: $code ($name) - $market - 権利付最終日: $ex_date" >&2
+    echo "処理中: $code ($name) - $market - 指定日: $ex_date" >&2
 
     # 日付フォーマット変換
     ex_date_api=$(convert_date_format "$ex_date")
 
-    # 4. 権利付最終日の株価を取得
+    # 4. 指定日の株価を取得
     ex_day_response=$(call_jquants_api "https://api.jquants.com/v1/prices/daily_quotes?code=$code&date=$ex_date_api")
 
     # レスポンスから終値を取得
     ex_day_close=$(echo "$ex_day_response" | jq -r '.daily_quotes[0].Close // empty')
 
     if [[ -z "$ex_day_close" ]]; then
-        echo "  警告: 権利付最終日($ex_date)の株価データが取得できませんでした。スキップします。" >&2
+        echo "  警告: 指定日($ex_date)の株価データが取得できませんでした。スキップします。" >&2
         sleep 0.3
         continue
     fi
 
-    echo "  権利付最終日の終値: $ex_day_close" >&2
+    echo "  指定日の終値: $ex_day_close" >&2
 
-    # 5. 権利確定日（翌日）から余裕を持って20日分のデータを取得
+    # 5. 指定日（翌日）から余裕を持って20日分のデータを取得
     ex_rights_date=$(add_days "$ex_date_api" 1)
     end_date=$(add_days "$ex_date_api" 21)
 
@@ -142,14 +142,14 @@ tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
     min_close=$(echo "$period_response" | jq -r '[.daily_quotes[0:10][].Close] | min')
 
     if [[ -z "$min_close" || "$min_close" == "null" ]]; then
-        echo "  警告: 権利確定日以降の株価データが取得できませんでした。スキップします。" >&2
+        echo "  警告: 指定日以降の株価データが取得できませんでした。スキップします。" >&2
         sleep 0.3
         continue
     fi
 
     echo "  10営業日間の最安値: $min_close" >&2
 
-    # 6. 最安値が権利付最終日の株価の95%未満かチェック
+    # 6. 最安値が指定日の株価の95%未満かチェック
     threshold=$(echo "$ex_day_close * 0.95" | bc)
 
     if (( $(echo "$min_close < $threshold" | bc -l) )); then
@@ -169,7 +169,7 @@ echo "" >&2
 
 # 条件に該当する銘柄を表示
 if [[ -s "$RESULT_FILE" ]]; then
-    echo "=== 条件に該当する銘柄（最安値が権利付最終日の株価の95%未満）===" >&2
+    echo "=== 条件に該当する銘柄（最安値が指定日の株価の95%未満）===" >&2
     echo "" >&2
     while IFS=',' read -r code name; do
         echo "証券コード: $code - 銘柄名: $name"
