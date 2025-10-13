@@ -32,7 +32,7 @@ if [[ -z "$JQUANTS_ID_TOKEN" ]]; then
 fi
 
 # 2. CSVヘッダーの確認
-REQUIRED_HEADERS=("証券コード" "銘柄名" "市場区分" "指定日")
+REQUIRED_HEADERS=("コード" "銘柄名" "市場" "指定日")
 HEADER=$(head -n 1 "$CSV_FILE")
 
 for required in "${REQUIRED_HEADERS[@]}"; do
@@ -108,7 +108,7 @@ tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
     ex_date=$(echo "$ex_date" | tr -d '\r\n' | xargs)
 
     # 市場区分のチェック（プライムまたはスタンダードのみ）
-    if [[ "$market" != "プライム" && "$market" != "スタンダード" ]]; then
+    if [[ "$market" != "東P" && "$market" != "東S" ]]; then
         continue
     fi
 
