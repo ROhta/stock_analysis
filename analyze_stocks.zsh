@@ -138,8 +138,8 @@ tail -n +2 "$CSV_FILE" | while IFS=',' read -r code name market ex_date; do
     # 期間の株価データを取得
     period_response=$(call_jquants_api "https://api.jquants.com/v1/prices/daily_quotes?code=$code&from=$ex_rights_date&to=$end_date")
 
-    # 営業日のデータを取得し、最初の10営業日の最安値を計算
-    min_close=$(echo "$period_response" | jq -r '[.daily_quotes[0:10][].Close] | min')
+    # 営業日のデータを取得し、最初の10営業日の最安値を計算（nullを除外）
+    min_close=$(echo "$period_response" | jq -r '[.daily_quotes[0:10][].Close | select(. != null)] | min')
 
     if [[ -z "$min_close" || "$min_close" == "null" ]]; then
         echo "  警告: 指定日以降の株価データが取得できませんでした。スキップします。" >&2
