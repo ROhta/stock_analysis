@@ -1,23 +1,23 @@
 /*
 =====================================
-使用例：chartSettingsのカスタマイズ
+Usage Example: Customizing chartSettings
 =====================================
 
-// 大企業向け設定例（売上高1兆円規模）
+// Example settings for large companies (revenue scale: 1 trillion yen)
 const largeCompanySettings = {
   chartSettings: {
     pl: {
-      domain: [0, 1500000],  // 0〜1.5兆円
-      ticks: [0, 300000, 600000, 900000, 1200000, 1500000],  // 3000億円ごと
+      domain: [0, 1500000],  // 0 to 1.5 trillion yen
+      ticks: [0, 300000, 600000, 900000, 1200000, 1500000],  // Every 300 billion yen
     },
     bs: {
-      domain: [0, 2000000],  // 0〜2兆円
-      ticks: [0, 500000, 1000000, 1500000, 2000000],  // 5000億円ごと
+      domain: [0, 2000000],  // 0 to 2 trillion yen
+      ticks: [0, 500000, 1000000, 1500000, 2000000],  // Every 500 billion yen
     },
     cf: {
       composition: {
-        domain: [-200000, 200000],  // -2000億〜+2000億円
-        ticks: [-200000, -100000, 0, 100000, 200000],  // 1000億円ごと
+        domain: [-200000, 200000],  // -200 billion to +200 billion yen
+        ticks: [-200000, -100000, 0, 100000, 200000],  // Every 100 billion yen
       },
       waterfall: {
         domain: [-200000, 500000],
@@ -29,24 +29,24 @@ const largeCompanySettings = {
       },
     },
   },
-  // ... 他のデータ
+  // ... other data
 };
 
-// 中小企業向け設定例（売上高50億円規模）
+// Example settings for small/medium companies (revenue scale: 5 billion yen)
 const smallCompanySettings = {
   chartSettings: {
     pl: {
-      domain: [0, 6000],  // 0〜60億円
-      ticks: [0, 1000, 2000, 3000, 4000, 5000, 6000],  // 10億円ごと
+      domain: [0, 6000],  // 0 to 6 billion yen
+      ticks: [0, 1000, 2000, 3000, 4000, 5000, 6000],  // Every 1 billion yen
     },
     bs: {
-      domain: [0, 4000],  // 0〜40億円
-      ticks: [0, 1000, 2000, 3000, 4000],  // 10億円ごと
+      domain: [0, 4000],  // 0 to 4 billion yen
+      ticks: [0, 1000, 2000, 3000, 4000],  // Every 1 billion yen
     },
     cf: {
       composition: {
-        domain: [-1000, 1000],  // -10億〜+10億円
-        ticks: [-1000, -500, 0, 500, 1000],  // 5億円ごと
+        domain: [-1000, 1000],  // -1 billion to +1 billion yen
+        ticks: [-1000, -500, 0, 500, 1000],  // Every 500 million yen
       },
       waterfall: {
         domain: [-1000, 2000],
@@ -58,58 +58,58 @@ const smallCompanySettings = {
       },
     },
   },
-  // ... 他のデータ
+  // ... other data
 };
 
-// chartSettingsを省略した場合はデフォルト値が使用されます
+// If chartSettings is omitted, default values will be used
 
 =====================================
-使用例：commentsのカスタマイズ
+Usage Example: Customizing comments
 =====================================
-// comments設定でB/SとC/Fのコメントをカスタマイズできます
+// You can customize comments for B/S and C/F sections using comments configuration
 
 const exampleCompanyData = {
-  // ... 他のデータ
+  // ... other data
 
   comments: {
     bs: {
-      // null: デフォルトコメント（流動比率・現金比率を自動計算）
+      // null: Default comment (automatically calculates current ratio and cash ratio)
       assets: null,
 
-      // カスタムコメント
-      liabilities: "💡 自己資本比率45% - 業界平均を上回る水準",
+      // Custom comment
+      liabilities: "💡 Equity ratio 45% - Above industry average",
     },
     cf: {
-      // null: デフォルトコメント（営業CFマージン・対純利益比を自動計算）
+      // null: Default comment (automatically calculates operating CF margin and CF-to-net-income ratio)
       operating: null,
 
-      // カスタムコメント
-      investing: "※新工場建設による設備投資",
+      // Custom comment
+      investing: "※ Capital expenditure for new factory construction",
 
-      // false: コメントを非表示
+      // false: Hide comment
       financing: false,
     },
   },
 };
 
-// コメント設定の値:
-// - null または undefined: デフォルトコメントを表示（自動計算）
-// - 文字列: カスタムコメントを表示
-// - false: コメントを非表示
+// Comment configuration values:
+// - null or undefined: Display default comment (auto-calculated)
+// - string: Display custom comment
+// - false: Hide comment
 
-// デフォルトコメント:
-// - bs.assets: 「💡 流動比率{X}% ／ 現金比率{Y}%」
-// - bs.liabilities: 「💡 自己資本比率{X}%」
-// - cf.operating: 「💡 営業CFマージン{X}% ／ 対純利益比{Y}%」
-// - cf.investing: なし
-// - cf.financing: なし
+// Default comments:
+// - bs.assets: "💡 Current ratio {X}% / Cash ratio {Y}%"
+// - bs.liabilities: "💡 Equity ratio {X}%"
+// - cf.operating: "💡 Operating CF margin {X}% / CF-to-net-income ratio {Y}%"
+// - cf.investing: None
+// - cf.financing: None
 */
 
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 
 // =====================================
-// 柿安本店データ
+// Kakiyasu Honten Data
 // =====================================
 const companyData = {
   name: "株式会社柿安本店",
@@ -118,33 +118,33 @@ const companyData = {
   period: "2025年4月期",
   announcementDate: "2025年6月10日",
 
-  // グラフの軸設定（百万円単位で指定）
+  // Chart axis settings (specify in million yen units)
   chartSettings: {
     pl: {
-      // 損益構造・3期比較用
-      domain: [0, 40000],  // 0〜400億円
-      ticks: [0, 10000, 20000, 30000, 40000],  // 100億円ごと
+      // For P/L structure and 3-period comparison
+      domain: [0, 40000],  // 0 to 40,000 million yen (display guide: approx. 0-400 hundred million yen)
+      ticks: [0, 10000, 20000, 30000, 40000],  // 10,000 million yen increments (display guide: approx. every 100 hundred million yen)
     },
     bs: {
-      // 貸借対照表用
-      domain: [0, 20000],  // 0〜200億円
-      ticks: [0, 5000, 10000, 15000, 20000],  // 50億円ごと
+      // For balance sheet
+      domain: [0, 20000],  // 0 to 20,000 million yen (display guide: approx. 0-200 hundred million yen)
+      ticks: [0, 5000, 10000, 15000, 20000],  // 5,000 million yen increments (display guide: approx. every 50 hundred million yen)
     },
     cf: {
-      // キャッシュフロー構成用
+      // For cash flow composition
       composition: {
-        domain: [-4000, 4000],  // -40億〜+40億円
-        ticks: [-4000, -2000, 0, 2000, 4000],  // 20億円ごと
+        domain: [-4000, 4000],  // -4,000 to +4,000 million yen (display guide: approx. -40 to +40 hundred million yen)
+        ticks: [-4000, -2000, 0, 2000, 4000],  // 2,000 million yen increments (display guide: approx. every 20 hundred million yen)
       },
-      // 現金増減フロー用
+      // For cash change flow
       waterfall: {
-        domain: [-4000, 12000],  // -40億〜+120億円
-        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 20億円ごと
+        domain: [-4000, 12000],  // -4,000 to +12,000 million yen (display guide: approx. -40 to +120 hundred million yen)
+        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 2,000 million yen increments (display guide: approx. every 20 hundred million yen)
       },
-      // 3期キャッシュフロー比較用
+      // For 3-period cash flow comparison
       comparison: {
-        domain: [-4000, 12000],  // -40億〜+120億円
-        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 20億円ごと
+        domain: [-4000, 12000],  // -4,000 to +12,000 million yen (display guide: approx. -40 to +120 hundred million yen)
+        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 2,000 million yen increments (display guide: approx. every 20 hundred million yen)
       },
     },
   },
@@ -194,7 +194,7 @@ const companyData = {
     フリーCF: { value: -1208 },
     期首現金残高: { value: 10108 },
     期末現金残高: { value: 7995 },
-    // 内訳
+    // Details
     details: {
       営業CF: {
         税前利益: 1100,
@@ -220,38 +220,38 @@ const companyData = {
     { period: '2025年4月期', 営業CF: 1746, 投資CF: -2954, 財務CF: -905, フリーCF: -1208, 期末現金: 7995 },
   ],
 
-  // コメント設定（各セクションのコメントをカスタマイズ可能）
-  // nullまたは未指定の場合はデフォルトのコメントが表示されます
-  // falseを指定するとコメントを非表示にできます
+  // Comment settings (customizable for each section)
+  // Default comments will be displayed if null or unspecified
+  // Set to false to hide comments
   comments: {
     bs: {
-      assets: null,  // null = デフォルト（流動比率・現金比率を自動計算）
-      liabilities: null,  // null = デフォルト（自己資本比率を表示）
+      assets: null,  // null = default (automatically calculates current ratio and cash ratio)
+      liabilities: null,  // null = default (displays equity ratio)
     },
     cf: {
-      operating: null,  // null = デフォルト（営業CFマージン・対純利益比を自動計算）
-      investing: "※赤塚興産の完全子会社化による一時的支出",  // カスタムコメント
-      financing: "💡 有利子負債ゼロ・無借金経営を継続",  // カスタムコメント
+      operating: null,  // null = default (automatically calculates operating CF margin and CF-to-net-income ratio)
+      investing: "※ One-time expenditure for full acquisition of Akatsuka Kousan",  // Custom comment
+      financing: "💡 Debt-free management continues with zero interest-bearing debt",  // Custom comment
     },
   },
 };
 
 // =====================================
-// ユーティリティ関数
+// Utility Functions
 // =====================================
 const toOku = (value) => (value / 100).toFixed(0);
 const toOkuDecimal = (value) => (value / 100).toFixed(1);
 const calcPercent = (part, total) => ((part / total) * 100).toFixed(1);
 
 // =====================================
-// メインコンポーネント
+// Main Component
 // =====================================
 function FinancialStatements({ companyData }) {
   const [activeTab, setActiveTab] = useState('cf');
 
   const { name, code, market, period, announcementDate, pl, plComparison, bs, cf, cfComparison, chartSettings, comments } = companyData;
 
-  // デフォルトのチャート設定（chartSettingsが未指定の場合に使用）
+  // Default chart settings (used when chartSettings is not specified)
   const defaultChartSettings = {
     pl: {
       domain: [0, 50000],
@@ -277,7 +277,7 @@ function FinancialStatements({ companyData }) {
     },
   };
 
-  // チャート設定をマージ（指定があればそちらを優先）
+  // Merge chart settings (prioritize specified settings if available)
   const settings = {
     pl: chartSettings?.pl || defaultChartSettings.pl,
     bs: chartSettings?.bs || defaultChartSettings.bs,
@@ -293,16 +293,20 @@ function FinancialStatements({ companyData }) {
   const totalEquity = bs.equity.純資産;
   const grossProfitMargin = calcPercent(pl.売上総利益.value, pl.売上高.value);
 
-  // B/S指標の計算
-  const currentAssets = bs.assets.現金預金 + bs.assets.その他流動資産;  // 流動資産
-  const currentRatio = ((currentAssets / bs.liabilities.流動負債) * 100).toFixed(1);  // 流動比率
-  const cashRatio = calcPercent(bs.assets.現金預金, totalAssets);  // 現金比率
+  // B/S metrics calculation
+  const currentAssets = bs.assets.現金預金 + bs.assets.その他流動資産;  // Current assets
+  const currentRatio = bs.liabilities.流動負債
+    ? ((currentAssets / bs.liabilities.流動負債) * 100).toFixed(1)
+    : '-';  // Current ratio (placeholder when calculation is not possible)
+  const cashRatio = calcPercent(bs.assets.現金預金, totalAssets);  // Cash ratio
 
-  // C/F指標の計算
-  const operatingCFMargin = calcPercent(cf.営業CF.value, pl.売上高.value);  // 営業CFマージン
-  const cfToNetIncomeRatio = ((cf.営業CF.value / pl.当期純利益.value) * 100).toFixed(0);  // 対純利益比
+  // C/F metrics calculation
+  const operatingCFMargin = calcPercent(cf.営業CF.value, pl.売上高.value);  // Operating CF margin
+  const cfToNetIncomeRatio = pl.当期純利益.value
+    ? ((cf.営業CF.value / pl.当期純利益.value) * 100).toFixed(0)
+    : '-';  // CF-to-net-income ratio (placeholder when calculation is not possible)
 
-  // デフォルトコメントの生成
+  // Generate default comments
   const defaultComments = {
     bs: {
       assets: `💡 流動比率${currentRatio}% ／ 現金比率${cashRatio}%`,
@@ -315,12 +319,12 @@ function FinancialStatements({ companyData }) {
     },
   };
 
-  // コメント設定をマージ（カスタムコメントがあればそちらを優先、falseなら非表示）
+  // Merge comment settings (prioritize custom comments if available, hide if false)
   const getComment = (section, key) => {
     const customComment = comments?.[section]?.[key];
-    if (customComment === false) return null;  // falseなら非表示
-    if (customComment !== null && customComment !== undefined) return customComment;  // カスタムコメント
-    return defaultComments[section]?.[key] || null;  // デフォルトコメント
+    if (customComment === false) return null;  // Hide if false
+    if (customComment !== null && customComment !== undefined) return customComment;  // Custom comment
+    return defaultComments[section]?.[key] || null;  // Default comment
   };
 
   const plData = [
@@ -349,7 +353,7 @@ function FinancialStatements({ companyData }) {
     { value: '純資産', type: 'square', color: '#10b981' },
   ];
 
-  // C/F ウォーターフォールチャート用データ
+  // C/F waterfall chart data
   const cfWaterfallData = [
     { name: '期首現金', value: cf.期首現金残高.value, fill: '#6b7280', type: 'total' },
     { name: '営業CF', value: cf.営業CF.value, fill: '#22c55e', type: 'change' },
@@ -358,7 +362,7 @@ function FinancialStatements({ companyData }) {
     { name: '期末現金', value: cf.期末現金残高.value, fill: '#3b82f6', type: 'total' },
   ];
 
-  // C/F 棒グラフ用データ（フリーCFを除外）
+  // C/F bar chart data (excluding free CF)
   const cfBarData = [
     { name: '営業CF', value: cf.営業CF.value, color: '#22c55e' },
     { name: '投資CF', value: cf.投資CF.value, color: '#ef4444' },
@@ -685,7 +689,7 @@ function FinancialStatements({ companyData }) {
               </div>
             </div>
 
-            {/* C/F Bar Chart - 縦グラフ */}
+            {/* C/F Bar Chart - Vertical bar chart */}
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h2 className="text-xl font-bold text-gray-800 mb-4">💰 キャッシュフロー構成（億円）</h2>
               <ResponsiveContainer width="100%" height={350}>
@@ -727,7 +731,7 @@ function FinancialStatements({ companyData }) {
               </div>
             </div>
 
-            {/* Cash Flow Waterfall - 0ラインを基準とした棒グラフ */}
+            {/* Cash Flow Waterfall - Bar chart based on 0-line */}
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h2 className="text-xl font-bold text-gray-800 mb-4">📊 現金増減フロー（億円）</h2>
               <ResponsiveContainer width="100%" height={350}>
@@ -751,7 +755,7 @@ function FinancialStatements({ companyData }) {
                     formatter={(v) => [`${toOkuDecimal(v)}億円`, '金額']}
                     labelStyle={{ fontWeight: 'bold' }}
                   />
-                  {/* 0ラインを強調 */}
+                  {/* Emphasize 0-line */}
                   <ReferenceLine y={0} stroke="#374151" strokeWidth={2} />
                   <Bar dataKey="value" radius={[4, 4, 4, 4]}>
                     {[
@@ -810,7 +814,7 @@ function FinancialStatements({ companyData }) {
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h2 className="text-xl font-bold text-gray-800 mb-4">📋 キャッシュフロー内訳</h2>
               <div className="grid md:grid-cols-3 gap-6">
-                {/* 営業CF内訳 */}
+                {/* Operating CF details */}
                 <div className="p-4 bg-green-50 rounded-lg">
                   <h3 className="font-bold text-green-700 mb-3 text-lg flex items-center gap-2">
                     <span className="w-3 h-3 bg-green-500 rounded"></span>
@@ -837,7 +841,7 @@ function FinancialStatements({ companyData }) {
                   )}
                 </div>
 
-                {/* 投資CF内訳 */}
+                {/* Investing CF details */}
                 <div className="p-4 bg-red-50 rounded-lg">
                   <h3 className="font-bold text-red-700 mb-3 text-lg flex items-center gap-2">
                     <span className="w-3 h-3 bg-red-500 rounded"></span>
@@ -860,7 +864,7 @@ function FinancialStatements({ companyData }) {
                   )}
                 </div>
 
-                {/* 財務CF内訳 */}
+                {/* Financing CF details */}
                 <div className="p-4 bg-orange-50 rounded-lg">
                   <h3 className="font-bold text-orange-700 mb-3 text-lg flex items-center gap-2">
                     <span className="w-3 h-3 bg-orange-500 rounded"></span>
@@ -896,7 +900,7 @@ function FinancialStatements({ companyData }) {
   );
 }
 
-// 柿安本店データを渡して表示
+// Pass Kakiyasu Honten data to display
 export default function App() {
   return <FinancialStatements companyData={companyData} />;
 }
