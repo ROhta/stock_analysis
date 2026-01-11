@@ -1,16 +1,154 @@
+/*
+=====================================
+使用例：chartSettingsのカスタマイズ
+=====================================
+
+// 大企業向け設定例（売上高1兆円規模）
+const largeCompanySettings = {
+  chartSettings: {
+    pl: {
+      domain: [0, 1500000],  // 0〜1.5兆円
+      ticks: [0, 300000, 600000, 900000, 1200000, 1500000],  // 3000億円ごと
+    },
+    bs: {
+      domain: [0, 2000000],  // 0〜2兆円
+      ticks: [0, 500000, 1000000, 1500000, 2000000],  // 5000億円ごと
+    },
+    cf: {
+      composition: {
+        domain: [-200000, 200000],  // -2000億〜+2000億円
+        ticks: [-200000, -100000, 0, 100000, 200000],  // 1000億円ごと
+      },
+      waterfall: {
+        domain: [-200000, 500000],
+        ticks: [-200000, 0, 100000, 200000, 300000, 400000, 500000],
+      },
+      comparison: {
+        domain: [-200000, 500000],
+        ticks: [-200000, 0, 100000, 200000, 300000, 400000, 500000],
+      },
+    },
+  },
+  // ... 他のデータ
+};
+
+// 中小企業向け設定例（売上高50億円規模）
+const smallCompanySettings = {
+  chartSettings: {
+    pl: {
+      domain: [0, 6000],  // 0〜60億円
+      ticks: [0, 1000, 2000, 3000, 4000, 5000, 6000],  // 10億円ごと
+    },
+    bs: {
+      domain: [0, 4000],  // 0〜40億円
+      ticks: [0, 1000, 2000, 3000, 4000],  // 10億円ごと
+    },
+    cf: {
+      composition: {
+        domain: [-1000, 1000],  // -10億〜+10億円
+        ticks: [-1000, -500, 0, 500, 1000],  // 5億円ごと
+      },
+      waterfall: {
+        domain: [-1000, 2000],
+        ticks: [-1000, 0, 500, 1000, 1500, 2000],
+      },
+      comparison: {
+        domain: [-1000, 2000],
+        ticks: [-1000, 0, 500, 1000, 1500, 2000],
+      },
+    },
+  },
+  // ... 他のデータ
+};
+
+// chartSettingsを省略した場合はデフォルト値が使用されます
+
+=====================================
+使用例：commentsのカスタマイズ
+=====================================
+// comments設定でB/SとC/Fのコメントをカスタマイズできます
+
+const exampleCompanyData = {
+  // ... 他のデータ
+
+  comments: {
+    bs: {
+      // null: デフォルトコメント（流動比率・現金比率を自動計算）
+      assets: null,
+
+      // カスタムコメント
+      liabilities: "💡 自己資本比率45% - 業界平均を上回る水準",
+    },
+    cf: {
+      // null: デフォルトコメント（営業CFマージン・対純利益比を自動計算）
+      operating: null,
+
+      // カスタムコメント
+      investing: "※新工場建設による設備投資",
+
+      // false: コメントを非表示
+      financing: false,
+    },
+  },
+};
+
+// コメント設定の値:
+// - null または undefined: デフォルトコメントを表示（自動計算）
+// - 文字列: カスタムコメントを表示
+// - false: コメントを非表示
+
+// デフォルトコメント:
+// - bs.assets: 「💡 流動比率{X}% ／ 現金比率{Y}%」
+// - bs.liabilities: 「💡 自己資本比率{X}%」
+// - cf.operating: 「💡 営業CFマージン{X}% ／ 対純利益比{Y}%」
+// - cf.investing: なし
+// - cf.financing: なし
+*/
+
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ComposedChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ComposedChart, Line, ReferenceLine } from 'recharts';
 
 // =====================================
 // 柿安本店データ
 // =====================================
-const kakiyasuData = {
+const companyData = {
   name: "株式会社柿安本店",
   code: "2294",
   market: "東証プライム",
   period: "2025年4月期",
   announcementDate: "2025年6月10日",
-  
+
+  // グラフの軸設定（百万円単位で指定）
+  chartSettings: {
+    pl: {
+      // 損益構造・3期比較用
+      domain: [0, 40000],  // 0〜400億円
+      ticks: [0, 10000, 20000, 30000, 40000],  // 100億円ごと
+    },
+    bs: {
+      // 貸借対照表用
+      domain: [0, 20000],  // 0〜200億円
+      ticks: [0, 5000, 10000, 15000, 20000],  // 50億円ごと
+    },
+    cf: {
+      // キャッシュフロー構成用
+      composition: {
+        domain: [-4000, 4000],  // -40億〜+40億円
+        ticks: [-4000, -2000, 0, 2000, 4000],  // 20億円ごと
+      },
+      // 現金増減フロー用
+      waterfall: {
+        domain: [-4000, 12000],  // -40億〜+120億円
+        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 20億円ごと
+      },
+      // 3期キャッシュフロー比較用
+      comparison: {
+        domain: [-4000, 12000],  // -40億〜+120億円
+        ticks: [-4000, -2000, 0, 2000, 4000, 6000, 8000, 10000, 12000],  // 20億円ごと
+      },
+    },
+  },
+
   pl: {
     売上高: { value: 36104, yoyChange: "▲2.6%" },
     売上原価: { value: 16525 },
@@ -22,13 +160,15 @@ const kakiyasuData = {
     営業外損益: { value: 38 },
     特別損益等: { value: -837 },
   },
-  
+
   plComparison: [
+    { period: '2021年2月期', 売上高: 37289, 営業利益: 1314, 経常利益: 1523, 純利益: 263 },
+    { period: '2022年2月期', 売上高: 37998, 営業利益: 2777, 経常利益: 3287, 純利益: 1704 },
     { period: '2023年4月期', 売上高: 35628, 営業利益: 2850, 経常利益: 2860, 純利益: 1889 },
     { period: '2024年4月期', 売上高: 37052, 営業利益: 2200, 経常利益: 2233, 純利益: 1400 },
     { period: '2025年4月期', 売上高: 36104, 営業利益: 1500, 経常利益: 1538, 純利益: 701 },
   ],
-  
+
   bs: {
     assets: {
       現金預金: 7995,
@@ -73,10 +213,27 @@ const kakiyasuData = {
   },
 
   cfComparison: [
+    { period: '2021年2月期', 営業CF: 1203, 投資CF: -812, 財務CF: -654, フリーCF: 391, 期末現金: 9952 },
+    { period: '2022年2月期', 営業CF: 2156, 投資CF: -623, 財務CF: -748, フリーCF: 1533, 期末現金: 10737 },
     { period: '2023年4月期', 営業CF: 2547, 投資CF: -699, 財務CF: -1054, フリーCF: 1848, 期末現金: 10745 },
     { period: '2024年4月期', 営業CF: 1410, 投資CF: -1152, 財務CF: -895, フリーCF: 258, 期末現金: 10108 },
     { period: '2025年4月期', 営業CF: 1746, 投資CF: -2954, 財務CF: -905, フリーCF: -1208, 期末現金: 7995 },
   ],
+
+  // コメント設定（各セクションのコメントをカスタマイズ可能）
+  // nullまたは未指定の場合はデフォルトのコメントが表示されます
+  // falseを指定するとコメントを非表示にできます
+  comments: {
+    bs: {
+      assets: null,  // null = デフォルト（流動比率・現金比率を自動計算）
+      liabilities: null,  // null = デフォルト（自己資本比率を表示）
+    },
+    cf: {
+      operating: null,  // null = デフォルト（営業CFマージン・対純利益比を自動計算）
+      investing: "※赤塚興産の完全子会社化による一時的支出",  // カスタムコメント
+      financing: "💡 有利子負債ゼロ・無借金経営を継続",  // カスタムコメント
+    },
+  },
 };
 
 // =====================================
@@ -91,13 +248,80 @@ const calcPercent = (part, total) => ((part / total) * 100).toFixed(1);
 // =====================================
 function FinancialStatements({ companyData }) {
   const [activeTab, setActiveTab] = useState('cf');
-  
-  const { name, code, market, period, announcementDate, pl, plComparison, bs, cf, cfComparison } = companyData;
+
+  const { name, code, market, period, announcementDate, pl, plComparison, bs, cf, cfComparison, chartSettings, comments } = companyData;
+
+  // デフォルトのチャート設定（chartSettingsが未指定の場合に使用）
+  const defaultChartSettings = {
+    pl: {
+      domain: [0, 50000],
+      ticks: [0, 10000, 20000, 30000, 40000, 50000],
+    },
+    bs: {
+      domain: [0, 25000],
+      ticks: [0, 5000, 10000, 15000, 20000, 25000],
+    },
+    cf: {
+      composition: {
+        domain: [-5000, 5000],
+        ticks: [-5000, -2500, 0, 2500, 5000],
+      },
+      waterfall: {
+        domain: [-5000, 15000],
+        ticks: [-5000, 0, 5000, 10000, 15000],
+      },
+      comparison: {
+        domain: [-5000, 15000],
+        ticks: [-5000, 0, 5000, 10000, 15000],
+      },
+    },
+  };
+
+  // チャート設定をマージ（指定があればそちらを優先）
+  const settings = {
+    pl: chartSettings?.pl || defaultChartSettings.pl,
+    bs: chartSettings?.bs || defaultChartSettings.bs,
+    cf: {
+      composition: chartSettings?.cf?.composition || defaultChartSettings.cf.composition,
+      waterfall: chartSettings?.cf?.waterfall || defaultChartSettings.cf.waterfall,
+      comparison: chartSettings?.cf?.comparison || defaultChartSettings.cf.comparison,
+    },
+  };
 
   const totalAssets = Object.values(bs.assets).reduce((sum, v) => sum + v, 0);
   const totalLiabilities = bs.liabilities.流動負債 + bs.liabilities.固定負債;
   const totalEquity = bs.equity.純資産;
   const grossProfitMargin = calcPercent(pl.売上総利益.value, pl.売上高.value);
+
+  // B/S指標の計算
+  const currentAssets = bs.assets.現金預金 + bs.assets.その他流動資産;  // 流動資産
+  const currentRatio = ((currentAssets / bs.liabilities.流動負債) * 100).toFixed(1);  // 流動比率
+  const cashRatio = calcPercent(bs.assets.現金預金, totalAssets);  // 現金比率
+
+  // C/F指標の計算
+  const operatingCFMargin = calcPercent(cf.営業CF.value, pl.売上高.value);  // 営業CFマージン
+  const cfToNetIncomeRatio = ((cf.営業CF.value / pl.当期純利益.value) * 100).toFixed(0);  // 対純利益比
+
+  // デフォルトコメントの生成
+  const defaultComments = {
+    bs: {
+      assets: `💡 流動比率${currentRatio}% ／ 現金比率${cashRatio}%`,
+      liabilities: `💡 自己資本比率${bs.自己資本比率}%`,
+    },
+    cf: {
+      operating: `💡 営業CFマージン${operatingCFMargin}% ／ 対純利益比${cfToNetIncomeRatio}%`,
+      investing: null,
+      financing: null,
+    },
+  };
+
+  // コメント設定をマージ（カスタムコメントがあればそちらを優先、falseなら非表示）
+  const getComment = (section, key) => {
+    const customComment = comments?.[section]?.[key];
+    if (customComment === false) return null;  // falseなら非表示
+    if (customComment !== null && customComment !== undefined) return customComment;  // カスタムコメント
+    return defaultComments[section]?.[key] || null;  // デフォルトコメント
+  };
 
   const plData = [
     { name: '売上高', value: pl.売上高.value, color: '#3b82f6' },
@@ -134,12 +358,11 @@ function FinancialStatements({ companyData }) {
     { name: '期末現金', value: cf.期末現金残高.value, fill: '#3b82f6', type: 'total' },
   ];
 
-  // C/F 棒グラフ用データ
+  // C/F 棒グラフ用データ（フリーCFを除外）
   const cfBarData = [
     { name: '営業CF', value: cf.営業CF.value, color: '#22c55e' },
     { name: '投資CF', value: cf.投資CF.value, color: '#ef4444' },
     { name: '財務CF', value: cf.財務CF.value, color: '#f97316' },
-    { name: 'フリーCF', value: cf.フリーCF.value, color: '#8b5cf6' },
   ];
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -149,11 +372,11 @@ function FinancialStatements({ companyData }) {
           <p className="font-semibold text-gray-800 mb-2">{label}</p>
           {payload.filter(p => p.value > 0).map((entry, index) => (
             <p key={index} style={{ color: entry.fill }} className="text-sm">
-              {entry.name}: {entry.value.toLocaleString()}百万円
+              {entry.name}: {toOkuDecimal(entry.value)}億円
             </p>
           ))}
           <p className="text-gray-600 font-semibold mt-2 pt-2 border-t">
-            合計: {payload.reduce((sum, p) => sum + (p.value || 0), 0).toLocaleString()}百万円
+            合計: {toOkuDecimal(payload.reduce((sum, p) => sum + (p.value || 0), 0))}億円
           </p>
         </div>
       );
@@ -167,7 +390,7 @@ function FinancialStatements({ companyData }) {
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{label}</p>
           <p style={{ color: payload[0]?.fill }} className="text-sm">
-            {payload[0]?.value.toLocaleString()}百万円
+            {toOkuDecimal(payload[0]?.value)}億円
           </p>
         </div>
       );
@@ -182,7 +405,7 @@ function FinancialStatements({ companyData }) {
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{label}</p>
           <p className="text-sm" style={{ color: value >= 0 ? '#22c55e' : '#ef4444' }}>
-            {value >= 0 ? '' : ''}{value.toLocaleString()}百万円
+            {toOkuDecimal(value)}億円
           </p>
         </div>
       );
@@ -249,12 +472,16 @@ function FinancialStatements({ companyData }) {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">📊 損益構造（百万円）</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">📊 損益構造（億円）</h2>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={plData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(v) => v.toLocaleString()} />
+                  <YAxis
+                    tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                    domain={settings.pl.domain}
+                    ticks={settings.pl.ticks}
+                  />
                   <Tooltip content={<PlTooltip />} />
                   <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                     {plData.map((entry, index) => (<Cell key={index} fill={entry.color} />))}
@@ -265,13 +492,17 @@ function FinancialStatements({ companyData }) {
 
             {plComparison && plComparison.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-md">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">📈 {plComparison.length}期業績比較</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">📈 {plComparison.length}期業績比較（億円）</h2>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={plComparison}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="period" />
-                    <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}B`} />
-                    <Tooltip formatter={(v) => `${v.toLocaleString()}百万円`} />
+                    <YAxis
+                      tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                      domain={settings.pl.domain}
+                      ticks={settings.pl.ticks}
+                    />
+                    <Tooltip formatter={(v) => `${toOkuDecimal(v)}億円`} />
                     <Legend />
                     <Bar dataKey="売上高" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="営業利益" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
@@ -365,22 +596,27 @@ function FinancialStatements({ companyData }) {
 
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h2 className="text-xl font-bold text-gray-800 mb-2">⚖️ 貸借対照表（積み上げ図）</h2>
-              <p className="text-sm text-gray-500 mb-6">左：資産の部 ／ 右：負債・純資産の部（単位：百万円）</p>
-              
+              <p className="text-sm text-gray-500 mb-6">左：資産の部 ／ 右：負債・純資産の部（単位：億円）</p>
+
               <ResponsiveContainer width="100%" height={450}>
                 <BarChart data={bsStackedData} barCategoryGap="20%">
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="side" tick={{ fontSize: 14, fontWeight: 'bold' }} axisLine={{ stroke: '#e5e7eb' }} />
-                  <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}B`} axisLine={{ stroke: '#e5e7eb' }} domain={[0, Math.ceil(totalAssets / 5000) * 5000]} />
+                  <YAxis
+                    tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    domain={settings.bs.domain}
+                    ticks={settings.bs.ticks}
+                  />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend wrapperStyle={{ paddingTop: 20 }} iconType="square" payload={customLegendPayload} />
-                  
+
                   <Bar dataKey="投資その他" stackId="stack" fill="#06b6d4" name="投資その他" label={renderCustomBarLabel('投資その他')} />
                   <Bar dataKey="無形固定資産" stackId="stack" fill="#8b5cf6" name="無形固定資産" />
                   <Bar dataKey="有形固定資産" stackId="stack" fill="#3b82f6" name="有形固定資産" label={renderCustomBarLabel('有形固定資産')} />
                   <Bar dataKey="その他流動資産" stackId="stack" fill="#84cc16" name="その他流動資産" label={renderCustomBarLabel('その他流動資産')} />
                   <Bar dataKey="現金預金" stackId="stack" fill="#22c55e" name="現金預金" radius={[4, 4, 0, 0]} label={renderCustomBarLabel('現金預金')} />
-                  
+
                   <Bar dataKey="純資産" stackId="stack" fill="#10b981" name="純資産" label={renderCustomBarLabel('純資産')} />
                   <Bar dataKey="固定負債" stackId="stack" fill="#f97316" name="固定負債" />
                   <Bar dataKey="流動負債" stackId="stack" fill="#ef4444" name="流動負債" radius={[4, 4, 0, 0]} label={renderCustomBarLabel('流動負債')} />
@@ -397,6 +633,11 @@ function FinancialStatements({ companyData }) {
                     <div className="flex items-center gap-2"><span className="w-3 h-3 bg-violet-500 rounded"></span><span>無形固定資産: {toOku(bs.assets.無形固定資産)}億円 ({calcPercent(bs.assets.無形固定資産, totalAssets)}%)</span></div>
                     <div className="flex items-center gap-2"><span className="w-3 h-3 bg-cyan-500 rounded"></span><span>投資その他: {toOku(bs.assets.投資その他)}億円 ({calcPercent(bs.assets.投資その他, totalAssets)}%)</span></div>
                   </div>
+                  {getComment('bs', 'assets') && (
+                    <div className="mt-3 p-2 bg-white rounded border border-blue-200">
+                      <p className="text-xs text-blue-700">{getComment('bs', 'assets')}</p>
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 bg-red-50 rounded-lg">
                   <h3 className="font-bold text-red-700 mb-2">【負債・純資産の部】{toOku(totalAssets)}億円</h3>
@@ -405,9 +646,11 @@ function FinancialStatements({ companyData }) {
                     <div className="flex items-center gap-2"><span className="w-3 h-3 bg-orange-500 rounded"></span><span>固定負債: {toOkuDecimal(bs.liabilities.固定負債)}億円 ({calcPercent(bs.liabilities.固定負債, totalAssets)}%)</span></div>
                     <div className="flex items-center gap-2"><span className="w-3 h-3 bg-emerald-500 rounded"></span><span>純資産: {toOku(bs.equity.純資産)}億円 ({calcPercent(bs.equity.純資産, totalAssets)}%)</span></div>
                   </div>
-                  <div className="mt-3 p-2 bg-white rounded border border-green-200">
-                    <p className="text-xs text-green-700">💡 自己資本比率{bs.自己資本比率}%</p>
-                  </div>
+                  {getComment('bs', 'liabilities') && (
+                    <div className="mt-3 p-2 bg-white rounded border border-green-200">
+                      <p className="text-xs text-green-700">{getComment('bs', 'liabilities')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -444,13 +687,31 @@ function FinancialStatements({ companyData }) {
 
             {/* C/F Bar Chart - 縦グラフ */}
             <div className="bg-white rounded-xl p-6 shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">💰 キャッシュフロー構成（百万円）</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">💰 キャッシュフロー構成（億円）</h2>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={cfBarData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tickFormatter={(v) => v.toLocaleString()} domain={['dataMin - 500', 'dataMax + 500']} />
+                  <YAxis
+                    tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                    domain={settings.cf.composition.domain}
+                    ticks={settings.cf.composition.ticks}
+                  />
                   <Tooltip content={<CfTooltip />} />
+                  <ReferenceLine y={0} stroke="#374151" strokeWidth={1} />
+                  <ReferenceLine
+                    y={cf.フリーCF.value}
+                    stroke="#8b5cf6"
+                    strokeWidth={3}
+                    strokeDasharray="8 4"
+                    label={{
+                      value: `フリーCF: ${toOkuDecimal(cf.フリーCF.value)}億円`,
+                      position: 'right',
+                      fill: '#8b5cf6',
+                      fontSize: 12,
+                      fontWeight: 'bold'
+                    }}
+                  />
                   <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                     {cfBarData.map((entry, index) => (
                       <Cell key={index} fill={entry.color} />
@@ -462,80 +723,50 @@ function FinancialStatements({ companyData }) {
                 <div className="flex items-center gap-2"><span className="w-3 h-3 bg-green-500 rounded"></span><span className="text-sm">営業CF</span></div>
                 <div className="flex items-center gap-2"><span className="w-3 h-3 bg-red-500 rounded"></span><span className="text-sm">投資CF</span></div>
                 <div className="flex items-center gap-2"><span className="w-3 h-3 bg-orange-500 rounded"></span><span className="text-sm">財務CF</span></div>
-                <div className="flex items-center gap-2"><span className="w-3 h-3 bg-purple-500 rounded"></span><span className="text-sm">フリーCF</span></div>
+                <div className="flex items-center gap-2"><span className="w-6 h-0.5 bg-purple-500" style={{ borderTop: '3px dashed #8b5cf6' }}></span><span className="text-sm">フリーCF（営業CF+投資CF）</span></div>
               </div>
             </div>
 
-            {/* Cash Flow Waterfall - 0ラインを基準 */}
+            {/* Cash Flow Waterfall - 0ラインを基準とした棒グラフ */}
             <div className="bg-white rounded-xl p-6 shadow-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">📊 現金増減フロー</h2>
-              <div className="relative py-8">
-                {/* 0円ライン */}
-                <div className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 border-t-2 border-gray-400 border-dashed z-0">
-                  <span className="absolute -left-2 -top-3 text-sm text-gray-500 bg-white px-1">0</span>
-                </div>
-                
-                <div className="flex justify-center items-center gap-2 relative z-10">
-                  {/* 期首現金 */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex flex-col items-center" style={{ marginBottom: '50px' }}>
-                      <div className="bg-gray-500 text-white px-4 py-3 rounded-lg text-center min-w-20">
-                        <div className="font-bold">{toOku(cf.期首現金残高.value)}億</div>
-                      </div>
-                    </div>
-                    <div className="text-xs font-semibold text-gray-600 mt-1">期首現金</div>
-                  </div>
-                  
-                  <div className="text-2xl text-gray-400">→</div>
-                  
-                  {/* 営業CF（プラス：上） */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex flex-col items-center" style={{ marginBottom: '50px' }}>
-                      <div className="bg-green-500 text-white px-4 py-3 rounded-lg text-center min-w-20">
-                        <div className="font-bold">+{toOkuDecimal(cf.営業CF.value)}億</div>
-                      </div>
-                    </div>
-                    <div className="text-xs font-semibold text-green-600 mt-1">営業CF</div>
-                  </div>
-                  
-                  <div className="text-2xl text-gray-400">+</div>
-                  
-                  {/* 投資CF（マイナス：下） */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex flex-col items-center" style={{ marginTop: '50px' }}>
-                      <div className="text-xs font-semibold text-red-600 mb-1">投資CF</div>
-                      <div className="bg-red-500 text-white px-4 py-3 rounded-lg text-center min-w-20">
-                        <div className="font-bold">{toOkuDecimal(cf.投資CF.value)}億</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-2xl text-gray-400">+</div>
-                  
-                  {/* 財務CF（マイナス：下） */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex flex-col items-center" style={{ marginTop: '50px' }}>
-                      <div className="text-xs font-semibold text-orange-600 mb-1">財務CF</div>
-                      <div className="bg-orange-500 text-white px-4 py-3 rounded-lg text-center min-w-20">
-                        <div className="font-bold">{toOkuDecimal(cf.財務CF.value)}億</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-2xl text-gray-400">=</div>
-                  
-                  {/* 期末現金 */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex flex-col items-center" style={{ marginBottom: '50px' }}>
-                      <div className="bg-blue-500 text-white px-4 py-3 rounded-lg text-center min-w-20">
-                        <div className="font-bold">{toOku(cf.期末現金残高.value)}億</div>
-                      </div>
-                    </div>
-                    <div className="text-xs font-semibold text-blue-600 mt-1">期末現金</div>
-                  </div>
-                </div>
-              </div>
-              
+              <h2 className="text-xl font-bold text-gray-800 mb-4">📊 現金増減フロー（億円）</h2>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart
+                  data={[
+                    { name: '期首現金', value: cf.期首現金残高.value, fill: '#6b7280' },
+                    { name: '営業CF', value: cf.営業CF.value, fill: '#22c55e' },
+                    { name: '投資CF', value: cf.投資CF.value, fill: '#ef4444' },
+                    { name: '財務CF', value: cf.財務CF.value, fill: '#f97316' },
+                    { name: '期末現金', value: cf.期末現金残高.value, fill: '#3b82f6' },
+                  ]}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                    domain={settings.cf.waterfall.domain}
+                    ticks={settings.cf.waterfall.ticks}
+                  />
+                  <Tooltip
+                    formatter={(v) => [`${toOkuDecimal(v)}億円`, '金額']}
+                    labelStyle={{ fontWeight: 'bold' }}
+                  />
+                  {/* 0ラインを強調 */}
+                  <ReferenceLine y={0} stroke="#374151" strokeWidth={2} />
+                  <Bar dataKey="value" radius={[4, 4, 4, 4]}>
+                    {[
+                      { name: '期首現金', value: cf.期首現金残高.value, fill: '#6b7280' },
+                      { name: '営業CF', value: cf.営業CF.value, fill: '#22c55e' },
+                      { name: '投資CF', value: cf.投資CF.value, fill: '#ef4444' },
+                      { name: '財務CF', value: cf.財務CF.value, fill: '#f97316' },
+                      { name: '期末現金', value: cf.期末現金残高.value, fill: '#3b82f6' },
+                    ].map((entry, index) => (
+                      <Cell key={index} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+
               <div className="text-center text-gray-500 text-sm mt-4 p-3 bg-gray-50 rounded-lg">
                 <span className="font-semibold">現金増減:</span> {cf.期末現金残高.value - cf.期首現金残高.value >= 0 ? '+' : ''}{toOkuDecimal(cf.期末現金残高.value - cf.期首現金残高.value)}億円
                 <span className="mx-2">|</span>
@@ -552,19 +783,24 @@ function FinancialStatements({ companyData }) {
             {/* 3-Year C/F Comparison */}
             {cfComparison && cfComparison.length > 0 && (
               <div className="bg-white rounded-xl p-6 shadow-md">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">📈 {cfComparison.length}期キャッシュフロー比較</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">📈 {cfComparison.length}期キャッシュフロー比較（億円）</h2>
                 <ResponsiveContainer width="100%" height={350}>
                   <ComposedChart data={cfComparison}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="period" />
-                    <YAxis yAxisId="left" tickFormatter={(v) => `${(v/1000).toFixed(1)}B`} />
-                    <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => `${(v/1000).toFixed(1)}B`} />
-                    <Tooltip formatter={(v) => `${v.toLocaleString()}百万円`} />
+                    <YAxis
+                      tickFormatter={(v) => `${(v/100).toFixed(0)}億`}
+                      domain={settings.cf.comparison.domain}
+                      ticks={settings.cf.comparison.ticks}
+                    />
+                    <Tooltip formatter={(v) => `${toOkuDecimal(v)}億円`} />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="営業CF" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                    <Bar yAxisId="left" dataKey="投資CF" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                    <Bar yAxisId="left" dataKey="財務CF" fill="#f97316" radius={[4, 4, 0, 0]} />
-                    <Line yAxisId="right" type="monotone" dataKey="期末現金" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }} />
+                    <ReferenceLine y={0} stroke="#374151" strokeWidth={1} />
+                    <Bar dataKey="営業CF" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="投資CF" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="財務CF" fill="#f97316" radius={[4, 4, 0, 0]} />
+                    <Line type="monotone" dataKey="フリーCF" stroke="#8b5cf6" strokeWidth={3} strokeDasharray="8 4" dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 6 }} />
+                    <Line type="monotone" dataKey="期末現金" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }} />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
@@ -594,6 +830,11 @@ function FinancialStatements({ companyData }) {
                       <span className="font-mono">+{toOkuDecimal(cf.details.営業CF.運転資本増減)}億円</span>
                     </div>
                   </div>
+                  {getComment('cf', 'operating') && (
+                    <div className="mt-3 p-2 bg-white rounded border border-green-200">
+                      <p className="text-xs text-green-700">{getComment('cf', 'operating')}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* 投資CF内訳 */}
@@ -612,9 +853,11 @@ function FinancialStatements({ companyData }) {
                       <span className="font-mono">{toOkuDecimal(cf.details.投資CF.有形固定資産取得)}億円</span>
                     </div>
                   </div>
-                  <div className="mt-3 p-2 bg-white rounded border border-red-200">
-                    <p className="text-xs text-red-700">※赤塚興産の完全子会社化による一時的支出</p>
-                  </div>
+                  {getComment('cf', 'investing') && (
+                    <div className="mt-3 p-2 bg-white rounded border border-red-200">
+                      <p className="text-xs text-red-700">{getComment('cf', 'investing')}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* 財務CF内訳 */}
@@ -633,9 +876,11 @@ function FinancialStatements({ companyData }) {
                       <span className="font-mono">{toOkuDecimal(cf.details.財務CF.その他)}億円</span>
                     </div>
                   </div>
-                  <div className="mt-3 p-2 bg-white rounded border border-orange-200">
-                    <p className="text-xs text-orange-700">💡 有利子負債ゼロ・無借金経営を継続</p>
-                  </div>
+                  {getComment('cf', 'financing') && (
+                    <div className="mt-3 p-2 bg-white rounded border border-orange-200">
+                      <p className="text-xs text-orange-700">{getComment('cf', 'financing')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -653,5 +898,5 @@ function FinancialStatements({ companyData }) {
 
 // 柿安本店データを渡して表示
 export default function App() {
-  return <FinancialStatements companyData={kakiyasuData} />;
+  return <FinancialStatements companyData={companyData} />;
 }
