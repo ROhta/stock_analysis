@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    schedule:
+      interval: "daily"
+      time: "10:00"
+      timezone: "Asia/Tokyo"
+    directories:
+      - "/**"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "_"
+    rebase-strategy: "auto"
+    versioning-strategy: increase-if-necessary
+  - package-ecosystem: "github-actions"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "10:00"
+      timezone: "Asia/Tokyo"
+    directory: "/"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "_"
+    rebase-strategy: "auto"

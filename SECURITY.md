@@ -1,6 +1,6 @@
 # セキュリティ対応方針
 
-- Dependabot Alertsに委ねる
+- Dependabotに委ねる
 - 能動的な施策はとらない
 
 ## 背景

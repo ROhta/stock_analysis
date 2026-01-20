@@ -17,8 +17,8 @@
 
 ## スクリプトの実行順
 
-1. get_id_token.zsh 認証情報を用いて、IDトークンを取得
-2. analysis_stock.zsh csvのファイルパスを引数にとって、分析結果を出力
+1. get_id_token.zsh : 認証情報を用いて、IDトークンを取得
+2. analysis_stock.zsh ; csvのファイルパスを引数にとって、分析結果を出力
 
 ## 分析内容
 
