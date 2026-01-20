@@ -1,0 +1,86 @@
+name: 企業分析
+description: 企業分析の結果を記録する
+title: "[分析] "
+labels: ["企業分析"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        企業分析の結果を記録してください。
+
+  - type: input
+    id: company-name
+    attributes:
+      label: 企業名
+      placeholder: "トヨタ自動車"
+    validations:
+      required: true
+
+  - type: input
+    id: stock-code
+    attributes:
+      label: 証券コード
+      placeholder: "7203"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: market
+    attributes:
+      label: 上場市場
+      options:
+        - 東証プライム
+        - 東証スタンダード
+        - 東証グロース
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sector
+    attributes:
+      label: 業種/セクター
+      options:
+        - 水産・農林業
+        - 鉱業
+        - 建設業
+        - 食料品
+        - 繊維製品
+        - パルプ・紙
+        - 化学
+        - 医薬品
+        - 石油・石炭製品
+        - ゴム製品
+        - ガラス・土石製品
+        - 鉄鋼
+        - 非鉄金属
+        - 金属製品
+        - 機械
+        - 電気機器
+        - 輸送用機器
+        - 精密機器
+        - その他製品
+        - 電気・ガス業
+        - 陸運業
+        - 海運業
+        - 空運業
+        - 倉庫・運輸関連業
+        - 情報・通信業
+        - 卸売業
+        - 小売業
+        - 銀行業
+        - 証券、商品先物取引業
+        - 保険業
+        - その他金融業
+        - 不動産業
+        - サービス業
+    validations:
+      required: false
+
+  - type: input
+    id: analysis-date
+    attributes:
+      label: 分析日
+      description: "YYYY/MM/DD 形式で入力してください"
+      placeholder: "2026/01/20"
+    validations:
+      required: true
