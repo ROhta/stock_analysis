@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCompanyData } from './hooks/useCompanyData';
-import { FinancialStatements } from './FinancialStatements';
+import { FinancialStatements } from './financialStatements';
 
 /**
  * アプリケーションエントリーポイント
