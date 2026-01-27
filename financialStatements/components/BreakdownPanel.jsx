@@ -37,19 +37,3 @@ export const BreakdownPanel = ({
     )}
   </div>
 );
-
-/**
- * 内訳項目の行コンポーネント
- */
-export const BreakdownItem = ({ dotColor, label, value, percent }) => (
-  <div className="flex justify-between items-center">
-    <div className="flex items-center gap-2">
-      <span className={`w-3 h-3 ${dotColor} rounded`}></span>
-      <span>{label}</span>
-    </div>
-    <div className="text-right">
-      <span className="font-mono font-bold">{value}</span>
-      {percent && <span className="text-gray-500 ml-2">({percent}%)</span>}
-    </div>
-  </div>
-);
