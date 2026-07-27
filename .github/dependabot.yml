@@ -13,6 +13,10 @@ updates:
       separator: "_"
     rebase-strategy: "auto"
     versioning-strategy: increase-if-necessary
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
   - package-ecosystem: "github-actions"
     schedule:
       interval: "weekly"
@@ -26,3 +30,7 @@ updates:
     pull-request-branch-name:
       separator: "_"
     rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
