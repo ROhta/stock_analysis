@@ -11,11 +11,25 @@
 #   mise run preview     # ビルド結果のプレビュー
 
 [tools]
-# node は 24 系の最新、pnpm は最新を取得する。
+# node / pnpm はパッチバージョンまで完全固定する（"26" や "latest" のような浮動指定は使わない）。
+# 浮動指定だと同じコミットでも解決タイミング次第で実バージョンが変わりうるため、宣言そのものを
+# 実バージョンに一致させ、ここを読めば入る版が判るようにする。
 # グローバル設定の node = "lts" をこのディレクトリでは上書きする。
-# "24" / "latest" は解決時に実バージョンへ確定し、mise.lock（lockfile=true）に固定される。
-node = "24"
-pnpm = "latest"
+#
+# 版を上げるときは本ファイルの値を書き換える（mise.lock 側が勝手に上がることはない）。
+# lockfile 有効化は本ファイルではなくグローバル設定（~/.config/mise/config.toml の
+# [settings] lockfile = true）から供給される。CI は `mise install --locked` で明示指定するため
+# 設定値には依存しない。完全固定にしても mise.lock は不要にならない。プラットフォーム別の
+# URL / checksum は lock にしか無く、`--locked` はそれを参照するため。
+#
+# 【重要】版数を上げたら必ず次を実行すること:
+#   mise lock node -p linux-arm64,linux-arm64-musl,linux-x64,linux-x64-musl,macos-arm64,macos-x64,windows-x64
+# `mise install` だけだと mise.lock の platforms.* が消えることがある（node 24→26 で実際に
+# 7 件が全消失した）。復元し忘れると CI の `mise install --locked` が linux-x64 で
+# "No lockfile URL found" により失敗する。実行後は platforms.* の数を更新前と必ず比較すること。
+# なお pnpm は macos-x64 の成果物を持たないため 6 件が正常（欠損ではない）。
+node = "26.5.0"
+pnpm = "11.17.0"
 
 [tasks.install]
 description = "pnpm で依存をインストール（入力に変化が無ければスキップ）"
