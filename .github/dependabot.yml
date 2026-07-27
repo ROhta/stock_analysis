@@ -5,7 +5,9 @@ updates:
       interval: "daily"
       time: "10:00"
       timezone: "Asia/Tokyo"
-    directory: "/"
+    # package.json はルートに無く financialStatements 配下のみ。"/" のままだと
+    # スケジュール実行のバージョン更新が対象ゼロ（下の ignore も効かない）になる。
+    directory: "/financialStatements"
     labels:
       - "dependencies"
     open-pull-requests-limit: 10

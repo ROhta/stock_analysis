@@ -13,7 +13,17 @@
 [tools]
 # node は 26 系の最新、pnpm は最新を取得する。
 # グローバル設定の node = "lts" をこのディレクトリでは上書きする。
-# "26" / "latest" は解決時に実バージョンへ確定し、mise.lock（lockfile=true）に固定される。
+# "26" / "latest" は解決時に実バージョンへ確定し、mise.lock に固定される。
+# lockfile 有効化は本ファイルではなくグローバル設定（~/.config/mise/config.toml の
+# [settings] lockfile = true）から供給される。CI は `mise install --locked` で明示指定するため
+# 設定値には依存しない。
+#
+# 【重要】版数を上げたら必ず次を実行すること:
+#   mise lock node -p linux-arm64,linux-arm64-musl,linux-x64,linux-x64-musl,macos-arm64,macos-x64,windows-x64
+# `mise install` だけだと mise.lock の platforms.* が消えることがある（node 24→26 で実際に
+# 7 件が全消失した）。復元し忘れると CI の `mise install --locked` が linux-x64 で
+# "No lockfile URL found" により失敗する。実行後は platforms.* の数を更新前と必ず比較すること。
+# なお pnpm は macos-x64 の成果物を持たないため 6 件が正常（欠損ではない）。
 node = "26"
 pnpm = "latest"
 
