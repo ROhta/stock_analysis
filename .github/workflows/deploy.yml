@@ -26,7 +26,7 @@ jobs:
 
       # node / pnpm のバージョンは financialStatements/mise.toml + mise.lock を単一ソースとして
       # mise で導入する（ローカル開発と完全に同一の版になる）。
-      # mise.toml は node = "24" / pnpm = "latest" の浮動指定で、実バージョンは mise.lock が
+      # mise.toml は node = "26" / pnpm = "latest" の浮動指定で、実バージョンは mise.lock が
       # 固定する。ここに実バージョンを書くと mise.lock の更新に追随できず必ずドリフトするため書かない。
       - name: Setup mise (node / pnpm)
         uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3

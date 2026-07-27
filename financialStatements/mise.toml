@@ -11,10 +11,10 @@
 #   mise run preview     # ビルド結果のプレビュー
 
 [tools]
-# node は 24 系の最新、pnpm は最新を取得する。
+# node は 26 系の最新、pnpm は最新を取得する。
 # グローバル設定の node = "lts" をこのディレクトリでは上書きする。
-# "24" / "latest" は解決時に実バージョンへ確定し、mise.lock（lockfile=true）に固定される。
-node = "24"
+# "26" / "latest" は解決時に実バージョンへ確定し、mise.lock（lockfile=true）に固定される。
+node = "26"
 pnpm = "latest"
 
 [tasks.install]
