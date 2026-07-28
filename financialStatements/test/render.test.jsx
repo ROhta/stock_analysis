@@ -18,10 +18,19 @@
 // なお jsdom での recharts の描画は 1 回あたり数秒かかる。レンダー回数を増やすと
 // テスト時間が線形に伸びるので、1 度描画してタブを巡回する形にまとめている。
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { FinancialStatements } from '../financialStatements';
-import companyData from '../public/kakiyasu2026.json';
+
+// public/ 配下は Vite が「バンドルせず dist にそのままコピーする静的アセット」として扱う領域で、
+// モジュールとして import する使い方は想定されていない（ルート絶対パスの URL で参照するもの）。
+// 実行時にファイルとして読むことで、その扱いに沿いつつ実データをそのままテストに使う。
+// フィクスチャを別途複製すると実データとdrift するため、コピーは作らない。
+const companyData = JSON.parse(
+  readFileSync(join(import.meta.dirname, '../public/kakiyasu2026.json'), 'utf8'),
+);
 
 // FinancialStatements は companyData を props で受け取るため、?companyData= を解決する
 // useCompanyData（fetch 依存）を経由せずに描画できる。テストデータは実データを流用する。
