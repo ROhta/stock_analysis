@@ -28,10 +28,13 @@ jobs:
       # mise で導入する（ローカル開発と完全に同一の版になる）。
       # ここには具体的なバージョンも宣言スタイルも書かない。書けば単一ソース側の変更に追随できず
       # 必ずドリフトする（実際に過去 2 回陳腐化させた）。版を知りたい場合は上記 2 ファイルを見ること。
+      # mise 本体も固定する。未指定だと最新リリースが入るため、lockfile を解釈する側だけが
+      # 浮動して再現性が崩れる。値は実 CI ログで確認した版のみを書く（推測で書かない）。
       - name: Setup mise (node / pnpm)
         uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
           working_directory: financialStatements
+          version: "2026.7.14"
 
       - name: Install dependencies
         working-directory: financialStatements
