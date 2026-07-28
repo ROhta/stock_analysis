@@ -24,6 +24,17 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-patch"
+    # react 系は版を揃える必要があるため 1 つの PR にまとめる。recharts は react-is を
+    # optional 指定の無い必須 peer dependency として要求し、React 19 では react と react-is の
+    # 版一致が求められる。個別 PR だと react だけ上がって react-is が取り残され、peer 要件が
+    # 崩れる（実際に react 19.2.8 に対し react-is 18.3.1 が入っていた）。
+    # パターンに一致しない依存は従来どおり個別 PR で更新されるため、他への影響は無い。
+    groups:
+      npm-react-dependencies:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-is"
   - package-ecosystem: "github-actions"
     schedule:
       interval: "weekly"
