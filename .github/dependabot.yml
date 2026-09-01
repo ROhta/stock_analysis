@@ -15,8 +15,10 @@ updates:
       separator: "_"
     rebase-strategy: "auto"
     versioning-strategy: increase-if-necessary
-    # パッチ更新は PR 化しない（マイナー以上のみ PR 化する）。ノイズ削減が目的。
-    # セキュリティ更新はこの ignore の影響を受けず、パッチ版の脆弱性修正でも PR は作られる
+    # パッチ・マイナー更新は PR 化しない（メジャーのみ PR 化する）。ノイズ削減が目的。
+    # 注意: 0.x 系の依存は semver 上の major 相当の破壊的変更が minor として扱われるため、
+    # この ignore に吸収される（PR は作られない）。
+    # セキュリティ更新はこの ignore の影響を受けず、パッチ・マイナー版の脆弱性修正でも PR は作られる
     # （dependabot-core の silent/tests/testdata/su-err-all-versions-ignored.txt が
     # security-updates-only + ignore-conditions で PR が作られることをアサートしている）。
     # 実例: PR #30 は npm_and_yarn group 経由の vite 6.4.2 → 6.4.3（パッチ）。
@@ -24,6 +26,7 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-patch"
+          - "version-update:semver-minor"
     # react 系は版を揃える必要があるため 1 つの PR にまとめる。recharts は react-is を
     # optional 指定の無い必須 peer dependency として要求し、React 19 では react と react-is の
     # 版一致が求められる。個別 PR だと react だけ上がって react-is が取り残され、peer 要件が
@@ -48,9 +51,10 @@ updates:
     pull-request-branch-name:
       separator: "_"
     rebase-strategy: "auto"
-    # パッチ更新は PR 化しない（マイナー以上のみ PR 化する）。ノイズ削減が目的。
+    # パッチ・マイナー更新は PR 化しない（メジャーのみ PR 化する）。ノイズ削減が目的。
     # 上の npm ブロックと同様、セキュリティ更新はこの ignore の影響を受けない。
     ignore:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-patch"
+          - "version-update:semver-minor"
