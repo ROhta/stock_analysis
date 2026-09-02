@@ -192,6 +192,10 @@ export const CFSection = ({ cf, cfComparison, settings, getComment }) => {
             items={[
               { dotColor: 'bg-red-500', label: '子会社株式取得', value: `${toOkuDecimal(cf.details.投資CF.子会社株式取得)}億円` },
               { dotColor: 'bg-red-400', label: '有形固定資産取得', value: `${toOkuDecimal(cf.details.投資CF.有形固定資産取得)}億円` },
+              // その他は主要2項目で説明しきれない差額の調整項目。持たない企業データもあるため存在する場合のみ表示する
+              ...(cf.details.投資CF.その他 !== undefined
+                ? [{ dotColor: 'bg-red-300', label: 'その他', value: `${toOkuDecimal(cf.details.投資CF.その他)}億円` }]
+                : []),
             ]}
             comment={getComment('cf', 'investing')}
             commentBorderColor="border-red-200"
